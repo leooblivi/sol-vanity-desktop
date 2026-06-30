@@ -42,16 +42,16 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Copy-Item target/release/bundle/msi/*.msi dist/ -ErrorAction SilentlyContinue
-          Copy-Item target/release/bundle/nsis/*.exe dist/ -ErrorAction SilentlyContinue
+          Get-Item target/release/bundle/msi/*.msi   | Copy-Item -Destination dist/sol-vanity-windows.msi
+          Get-Item target/release/bundle/nsis/*.exe  | Copy-Item -Destination dist/sol-vanity-windows-setup.exe
 
       - name: stage artifacts (macos)
         if: matrix.platform == 'macos-latest'
         shell: bash
         run: |
           mkdir -p dist
-          cp target/universal-apple-darwin/release/bundle/dmg/*.dmg dist/ 2>/dev/null || true
-          cp target/release/bundle/dmg/*.dmg dist/ 2>/dev/null || true
+          cp target/universal-apple-darwin/release/bundle/dmg/*.dmg dist/sol-vanity-mac.dmg 2>/dev/null || \
+          cp target/release/bundle/dmg/*.dmg dist/sol-vanity-mac.dmg 2>/dev/null || true
 
       - name: upload artifacts
         uses: actions/upload-artifact@v4
