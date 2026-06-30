@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sol Vanity — desktop</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="screen">
+  <header class="title">
+    <h1>SOL VANITY</h1>
+    <p class="subtitle">generate a solana address with your own keyword</p>
+  </header>
+
+  <main class="panel">
+
+    <label class="field-label" for="keyword">KEYWORD (UP TO 7 CHARS)</label>
+    <input id="keyword" class="pixel-input" type="text" maxlength="7" placeholder="leo" autocomplete="off" spellcheck="false" />
+    <p id="keyword-error" class="error-text" hidden></p>
+
+    <div class="field-label">MATCH POSITION</div>
+    <div class="position-row" id="position-row">
+      <button class="pos-btn active" data-pos="start">START</button>
+      <button class="pos-btn" data-pos="end">END</button>
+      <button class="pos-btn" data-pos="anywhere">ANY</button>
+    </div>
+
+    <label class="checkbox-row">
+      <input type="checkbox" id="case-sensitive" />
+      <span>case sensitive match</span>
+    </label>
+
+    <div class="estimate-box" id="estimate-box">
+      <div class="box-label">ESTIMATED TIME</div>
+      <div class="estimate-value" id="estimate-value">—</div>
+      <div class="estimate-detail" id="estimate-detail">type a keyword to see an estimate</div>
+    </div>
+
+    <div class="warning-box" id="warning-box">
+      <div class="box-label">/!\ NATIVE SPEED</div>
+      <div class="warning-detail">
+        This app runs the search natively in Rust, using every CPU core on your machine — much faster than the browser version. 6-7 character keywords are still slow; keep the app open while it works.
+      </div>
+    </div>
+
+    <button id="grind-btn" class="grind-btn">GRIND</button>
+    <button id="stop-btn" class="grind-btn stop-btn" hidden>STOP</button>
+
+    <div class="progress-box" id="progress-box" hidden>
+      <div class="progress-head">
+        <span>SCANNING...</span>
+        <span id="progress-eta">ETA —</span>
+      </div>
+
+      <div class="dino-scene">
+        <svg id="dino" class="dino" viewBox="0 0 24 24" shape-rendering="crispEdges">
+          <g class="dino-frame-a" fill="currentColor">
+            <rect x="6" y="4" width="10" height="2"/>
+            <rect x="6" y="6" width="12" height="2"/>
+            <rect x="6" y="8" width="12" height="2"/>
+            <rect x="4" y="10" width="14" height="2"/>
+            <rect x="4" y="12" width="14" height="2"/>
+            <rect x="4" y="14" width="12" height="2"/>
+            <rect x="4" y="16" width="4" height="2"/>
+            <rect x="12" y="16" width="4" height="2"/>
+            <rect x="2" y="18" width="4" height="2"/>
+            <rect x="14" y="18" width="2" height="2"/>
+            <rect x="14" y="6" width="2" height="2" fill="var(--field)"/>
+          </g>
+          <g class="dino-frame-b" fill="currentColor">
+            <rect x="6" y="4" width="10" height="2"/>
+            <rect x="6" y="6" width="12" height="2"/>
+            <rect x="6" y="8" width="12" height="2"/>
+            <rect x="4" y="10" width="14" height="2"/>
+            <rect x="4" y="12" width="14" height="2"/>
+            <rect x="4" y="14" width="12" height="2"/>
+            <rect x="6" y="16" width="4" height="2"/>
+            <rect x="14" y="16" width="2" height="2"/>
+            <rect x="4" y="18" width="2" height="2"/>
+            <rect x="16" y="18" width="2" height="2"/>
+            <rect x="14" y="6" width="2" height="2" fill="var(--field)"/>
+          </g>
+        </svg>
+        <div class="dino-ground"></div>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-foot">
+        <span id="progress-tries">0 TRIES</span>
+        <span id="progress-rate">0/s</span>
+      </div>
+    </div>
+
+    <div class="result-box" id="result-box" hidden>
+      <div class="box-label result-label">MATCH FOUND</div>
+      <div class="result-address" id="result-address"></div>
+      <div class="result-actions">
+        <button class="result-btn" id="copy-key-btn">COPY KEY</button>
+        <button class="result-btn" id="save-json-btn">SAVE .JSON</button>
+      </div>
+      <p class="result-warn">save this now — it will not be shown again</p>
+    </div>
+
+    <details class="terms">
+      <summary>
+        <span>TERMS &amp; SAFETY</span>
+        <span class="chevron">▾</span>
+      </summary>
+      <div class="terms-body">
+        - All key generation runs natively on YOUR device. Nothing is sent over the network — this app makes no network calls at all.<br/>
+        - We never see, store, or have access to your private key.<br/>
+        - "SAVE .JSON" writes a standard Solana keypair file to your device. Keep it offline, never share it.<br/>
+        - Import it later with the <code>solana-keygen</code> CLI, or "Import private key" in Phantom, Backpack, or Solflare.<br/>
+        - Lost the file = lost the wallet. There is no recovery.
+      </div>
+    </details>
+
+    <div class="link-row">
+      <a href="https://x.com/leonardong169" target="_blank" rel="noopener noreferrer" class="link-btn">X · LEONARDO</a>
+      <a href="https://x.com/sunnyteehee" target="_blank" rel="noopener noreferrer" class="link-btn">X · SUNNY</a>
+    </div>
+    <div class="link-row">
+      <a href="https://solana.com/vi/developers/cookbook/wallets/generate-vanity-address" target="_blank" rel="noopener noreferrer" class="link-btn link-btn-wide">↗ HOW IT WORKS</a>
+    </div>
+
+    <p class="footer-note">100% local. runs offline. your key never leaves this device.</p>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

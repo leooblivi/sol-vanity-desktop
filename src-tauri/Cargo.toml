@@ -1,0 +1,17 @@
+[package]
+name = "sol-vanity-desktop"
+version = "0.1.0"
+description = "Generate a custom Solana vanity address — native desktop app"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "1", features = [] }
+
+[dependencies]
+tauri = { version = "1", features = ["shell-open"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+vanity-core = { path = "../vanity-core" }
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]

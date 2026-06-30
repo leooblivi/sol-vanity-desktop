@@ -1,0 +1,16 @@
+[package]
+name = "vanity-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ed25519-dalek = { version = "=2.0.0", features = ["rand_core"] }
+rand = "0.8"
+bs58 = "0.5"
+serde = { version = "1", features = ["derive"] }
+zeroize = "=1.7.0"
+base64ct = "=1.6.0"
+
+[lib]
+name = "vanity_core"
+path = "src/lib.rs"
