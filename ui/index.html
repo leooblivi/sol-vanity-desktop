@@ -28,10 +28,14 @@
       <button class="pos-btn" data-pos="anywhere">ANY</button>
     </div>
 
-    <label class="checkbox-row">
-      <input type="checkbox" id="case-sensitive" />
-      <span>case sensitive match</span>
-    </label>
+    <div class="row-split">
+      <label class="checkbox-row">
+        <input type="checkbox" id="case-sensitive" />
+        <span>case sensitive match</span>
+      </label>
+      <button id="sound-toggle" class="sound-toggle" aria-label="toggle sound">SOUND: ON</button>
+    </div>
+    <p class="case-note" id="case-note"></p>
 
     <div class="estimate-box" id="estimate-box">
       <div class="box-label">ESTIMATED TIME</div>
@@ -50,6 +54,7 @@
     <button id="stop-btn" class="grind-btn stop-btn" hidden>STOP</button>
 
     <div class="progress-box" id="progress-box" hidden>
+      <p class="closing-warning">/!\ don't close this window — closing it stops the search and any progress is lost.</p>
       <div class="progress-head">
         <span>SCANNING...</span>
         <span id="progress-eta">ETA —</span>
@@ -109,7 +114,7 @@
     <details class="terms">
       <summary>
         <span>TERMS &amp; SAFETY</span>
-        <span class="chevron">▾</span>
+        <span class="chevron">▼</span>
       </summary>
       <div class="terms-body">
         - All key generation runs natively on YOUR device. Nothing is sent over the network — this app makes no network calls at all.<br/>

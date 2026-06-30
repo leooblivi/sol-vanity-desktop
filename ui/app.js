@@ -37,6 +37,7 @@ const estimateDetail = document.getElementById('estimate-detail');
 const grindBtn = document.getElementById('grind-btn');
 const stopBtn = document.getElementById('stop-btn');
 const progressBox = document.getElementById('progress-box');
+const progressFill = document.getElementById('progress-fill');
 const progressTries = document.getElementById('progress-tries');
 const progressRate = document.getElementById('progress-rate');
 const progressEta = document.getElementById('progress-eta');
@@ -44,6 +45,70 @@ const resultBox = document.getElementById('result-box');
 const resultAddress = document.getElementById('result-address');
 const copyKeyBtn = document.getElementById('copy-key-btn');
 const saveJsonBtn = document.getElementById('save-json-btn');
+const caseNote = document.getElementById('case-note');
+const soundToggle = document.getElementById('sound-toggle');
+
+// ---- arcade sound engine ----
+let audioCtx = null;
+let scanInterval = null;
+let soundOn = localStorage.getItem('sol-vanity-sound') !== 'off';
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function beep(freq, duration, type = 'square', volume = 0.05, delay = 0) {
+  if (!soundOn) return;
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.value = volume;
+  osc.connect(gain).connect(ctx.destination);
+  const start = ctx.currentTime + delay;
+  osc.start(start);
+  gain.gain.setValueAtTime(volume, start);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  osc.stop(start + duration);
+}
+
+function startScanSound() {
+  if (scanInterval) return;
+  let step = 0;
+  const notes = [220, 277, 330, 277];
+  scanInterval = setInterval(() => {
+    beep(notes[step % notes.length], 0.08, 'square', 0.035);
+    step++;
+  }, 220);
+}
+
+function stopScanSound() {
+  if (scanInterval) {
+    clearInterval(scanInterval);
+    scanInterval = null;
+  }
+}
+
+function playFoundFanfare() {
+  beep(523, 0.1, 'square', 0.06, 0);
+  beep(659, 0.1, 'square', 0.06, 0.1);
+  beep(784, 0.1, 'square', 0.06, 0.2);
+  beep(1047, 0.22, 'square', 0.07, 0.32);
+}
+
+function updateSoundToggleLabel() {
+  soundToggle.textContent = soundOn ? 'SOUND: ON' : 'SOUND: OFF';
+}
+updateSoundToggleLabel();
+
+soundToggle.addEventListener('click', () => {
+  soundOn = !soundOn;
+  localStorage.setItem('sol-vanity-sound', soundOn ? 'on' : 'off');
+  updateSoundToggleLabel();
+  if (!soundOn) stopScanSound();
+});
 
 const VALID_CHARS = new Set(B58_ALPHABET.split(''));
 
@@ -105,7 +170,19 @@ positionRow.addEventListener('click', (e) => {
   updateEstimate();
 });
 
-caseSensitiveBox.addEventListener('change', updateEstimate);
+caseSensitiveBox.addEventListener('change', () => {
+  updateCaseNote();
+  updateEstimate();
+});
+
+function updateCaseNote() {
+  if (caseSensitiveBox.checked) {
+    caseNote.textContent = 'Solana addresses are case-sensitive — "Leo" and "leo" are different patterns. With this on, the result will match the exact uppercase/lowercase you typed.';
+  } else {
+    caseNote.textContent = 'Case ignored while searching (faster), so the match may come back as "Leo", "LEO", or "leo" — any casing of what you typed.';
+  }
+}
+updateCaseNote();
 
 function expectedTries(n, pos, caseSensitive) {
   if (n === 0) return 0;
@@ -170,9 +247,12 @@ async function startGrind() {
   grindBtn.hidden = true;
   stopBtn.hidden = false;
   progressBox.hidden = false;
+  progressFill.style.width = '0%';
   progressTries.textContent = '0 TRIES';
   progressRate.textContent = '0/s';
   progressEta.textContent = 'ETA —';
+
+  startScanSound();
 
   const caseSensitive = caseSensitiveBox.checked;
   try {
@@ -204,12 +284,16 @@ function renderProgress(expected) {
   progressTries.textContent = `${formatNumber(totalTries)} TRIES`;
   progressRate.textContent = `${formatNumber(rate)}/s`;
 
+  const pct = Math.min(95, (totalTries / expected) * 100);
+  progressFill.style.width = `${pct}%`;
+
   const remaining = Math.max(0, expected - totalTries);
   const etaSec = (remaining / rate) * ESTIMATE_BUFFER;
   progressEta.textContent = `ETA ${formatDuration(etaSec)} left`;
 }
 
 async function stopGrind(userInitiated) {
+  stopScanSound();
   if (polling) {
     clearInterval(polling);
     polling = null;
@@ -226,6 +310,7 @@ function onFound(address, secretKeyArray, keyword, pos, caseSensitive) {
   progressBox.hidden = true;
   grindBtn.hidden = false;
   stopBtn.hidden = true;
+  playFoundFanfare();
 
   resultAddress.innerHTML = highlightMatch(address, keyword, pos, caseSensitive);
   resultBox.hidden = false;
