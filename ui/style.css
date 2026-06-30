@@ -33,6 +33,14 @@ body {
 
 .title { text-align: center; margin-bottom: 18px; }
 
+.logo {
+  width: 64px;
+  height: 64px;
+  border: 2.5px solid var(--ink);
+  margin-bottom: 10px;
+  image-rendering: pixelated;
+}
+
 .title h1 {
   font-size: 18px;
   letter-spacing: 2px;
